@@ -19,10 +19,11 @@
     "containerPort": 80,
     "healthCheck": {
       "healthyThreshold": 2,
-      "unhealthyThreshold": 2,
-      "timeoutSeconds": 5,
-      "intervalSeconds": 30,
-      "path": "/health"
+      "unhealthyThreshold": 5,
+      "timeoutSeconds": 15,
+      "intervalSeconds": 60,
+      "path": "/health",
+      "successCodes": "200"
     }
   }
 } 

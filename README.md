@@ -22,8 +22,8 @@ This secure setup includes:
 ### 1. Clone or Download Project Files
 
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone https://github.com/intuitiva/llamafiler-embeddings-docker
+cd llamafiler-embeddings-docker
 ```
 
 ### 2. Download Required Files
@@ -54,7 +54,9 @@ Your directory should look like this:
 └── README.md
 ```
 
-### 4. Configure Authentication
+### 4. Configure Authentication (Required)
+
+You **must** configure authentication before starting the containers. Choose one option:
 
 **Option A: Using environment variables (recommended for automation)**
 ```bash
@@ -62,11 +64,13 @@ export AUTH_USERNAME=myuser
 export AUTH_PASSWORD=mysecurepassword
 ```
 
-**Option B: Using .env file**
+**Option B: Using .env file (recommended for development)**
 ```bash
 cp env.example .env
-# Edit .env file with your credentials
+# Edit .env file and change AUTH_PASSWORD to a secure value
 ```
+
+⚠️ **Important**: If you don't set authentication credentials, the nginx container will fail to start with permission errors.
 
 ## Running the Secure Server
 
@@ -172,6 +176,24 @@ echo $AUTH_PASSWORD
 # Or check .env file
 cat .env
 ```
+
+### nginx error: "Permission denied" accessing .htpasswd
+
+If you see an error like `open() "/etc/nginx/.htpasswd" failed (13: Permission denied)`, this means the authentication file wasn't created properly. 
+
+**Solution:**
+1. Make sure you have a `.env` file with authentication credentials:
+   ```bash
+   cp env.example .env
+   # Edit .env and set AUTH_PASSWORD to a secure value
+   ```
+
+2. Rebuild the nginx container:
+   ```bash
+   docker-compose down
+   docker-compose build --no-cache nginx
+   docker-compose up -d
+   ```
 
 ### Container fails to start with "exec format error"
 

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  llamafiler:
+    build: .
+    container_name: llamafiler-embeddings
+    networks:
+      - llamafiler-network
+    # No ports exposed - only accessible through nginx
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    container_name: llamafiler-proxy
+    ports:
+      - "8080:80"
+    environment:
+      - AUTH_USERNAME=${AUTH_USERNAME:-admin}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - llamafiler
+    networks:
+      - llamafiler-network
+    restart: unless-stopped
+
+networks:
+  llamafiler-network:
+    driver: bridge 

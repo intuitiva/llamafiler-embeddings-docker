@@ -1,0 +1,28 @@
+{
+  "containers": {
+    "llamafiler": {
+      "image": "{{REGISTRY}}/{{APP_IMAGE_NAME}}:latest"
+    },
+    "nginx": {
+      "image": "{{REGISTRY}}/{{NGINX_IMAGE_NAME}}:latest",
+      "ports": {
+        "80": "HTTP"
+      },
+      "environment": {
+        "AUTH_USERNAME": "{{AUTH_USERNAME}}",
+        "AUTH_PASSWORD": "{{AUTH_PASSWORD}}"
+      }
+    }
+  },
+  "publicEndpoint": {
+    "containerName": "nginx",
+    "containerPort": 80,
+    "healthCheck": {
+      "healthyThreshold": 2,
+      "unhealthyThreshold": 2,
+      "timeoutSeconds": 5,
+      "intervalSeconds": 30,
+      "path": "/health"
+    }
+  }
+} 

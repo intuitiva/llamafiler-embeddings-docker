@@ -106,6 +106,8 @@ Once the server is running, you can access the embedding service at `http://loca
 curl http://localhost:8080/health
 ```
 
+This endpoint returns a simple "OK" response to verify that the service is running.
+
 ### Get Embeddings via API (Authentication Required)
 
 ```bash

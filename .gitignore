@@ -49,6 +49,7 @@ logs/
 *.tmp
 *.temp
 .cache/
+containers.json
 
 # Environment files
 .env

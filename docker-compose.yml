@@ -15,9 +15,6 @@ services:
     container_name: llamafiler-proxy
     ports:
       - "8080:80"
-    environment:
-      - AUTH_USERNAME=${AUTH_USERNAME:-admin}
-      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
     depends_on:
       - llamafiler
     networks:

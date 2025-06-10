@@ -3,6 +3,7 @@
 # === CONFIG ===
 SERVICE_NAME="llamafiler-embeddings"
 REGION="us-east-1"
+VERSION_TAG=$(date +%s) # Generate a unique tag based on the current timestamp
 
 APP_IMAGE_NAME="llamafiler-embeddings"
 NGINX_IMAGE_NAME="llamafiler-embeddings-nginx"
@@ -34,13 +35,13 @@ fi
 # === Get the registry URL ===
 echo "🔍 Getting registry URL..."
 # For Lightsail, we need to push to the service-specific registry
-REGISTRY="$SERVICE_NAME:latest"
+REGISTRY="$SERVICE_NAME" # This is just for reference, not used in image name
 echo "📋 Registry reference: $REGISTRY"
 
 # === 2. Build Docker images ===
-echo "🔨 Building Docker images..."
-docker build -t $APP_IMAGE_NAME -f Dockerfile .
-docker build -t $NGINX_IMAGE_NAME -f nginx.dockerfile .
+echo "🔨 Building Docker images with tag '$VERSION_TAG' for AMD64 architecture..."
+docker build --platform linux/amd64 -t "$APP_IMAGE_NAME:$VERSION_TAG" -f Dockerfile .
+docker build --platform linux/amd64 -t "$NGINX_IMAGE_NAME:$VERSION_TAG" -f nginx.dockerfile .
 
 # === 3. Push images directly to Lightsail ===
 echo "🚀 Pushing images to Lightsail container service..."
@@ -48,13 +49,13 @@ aws lightsail push-container-image \
   --region $REGION \
   --service-name $SERVICE_NAME \
   --label $APP_IMAGE_NAME \
-  --image $APP_IMAGE_NAME:latest
+  --image "$APP_IMAGE_NAME:$VERSION_TAG"
 
 aws lightsail push-container-image \
   --region $REGION \
   --service-name $SERVICE_NAME \
   --label $NGINX_IMAGE_NAME \
-  --image $NGINX_IMAGE_NAME:latest
+  --image "$NGINX_IMAGE_NAME:$VERSION_TAG"
 
 # === 5. Create containers.json from template ===
 echo "📝 Creating containers.json from template..."
@@ -71,6 +72,7 @@ AUTH_PASSWORD="${AUTH_PASSWORD:-changeme}"
 # For Lightsail, we reference images by their label:tag format (no registry prefix)
 sed \
   -e "s|{{REGISTRY}}/||g" \
+  -e "s|:latest|:$VERSION_TAG|g" \
   -e "s|{{APP_IMAGE_NAME}}|$APP_IMAGE_NAME|g" \
   -e "s|{{NGINX_IMAGE_NAME}}|$NGINX_IMAGE_NAME|g" \
   -e "s|{{AUTH_USERNAME}}|$AUTH_USERNAME|g" \

@@ -12,10 +12,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     # Download and install APE loader for handling Actually Portable Executables
     curl -L -o /usr/bin/ape https://cosmo.zip/pub/cosmos/bin/ape-$(uname -m).elf && \
-    chmod +x /usr/bin/ape && \
-    # Register APE binary format for llamafiler (Actually Portable Executable)
-    echo ':APE:M::MZqFpD::/usr/bin/ape:' > /proc/sys/fs/binfmt_misc/register || true && \
-    echo ':APE-jart:M::jartsr::/usr/bin/ape:' > /proc/sys/fs/binfmt_misc/register || true
+    chmod +x /usr/bin/ape;
+    # No longer attempting to register APE with binfmt_misc, for better portability.
 
 # Set working directory
 WORKDIR /usr/local/bin
@@ -38,5 +36,5 @@ WORKDIR /usr/local/bin
 EXPOSE 8080
 
 # Set entrypoint and default command - use shell wrapper to handle APE binary
-ENTRYPOINT ["sh", "-c"]
-CMD ["./llamafiler-0.9.3 -m /models/Qwen3-Embedding-0.6B-Q8_0.gguf -l 0.0.0.0:8080"]
+ENTRYPOINT ["/usr/bin/ape"]
+CMD ["./llamafiler-0.9.3", "-m", "/models/Qwen3-Embedding-0.6B-Q8_0.gguf", "-l", "0.0.0.0:8080"]
